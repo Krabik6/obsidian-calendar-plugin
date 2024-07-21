@@ -4,3 +4,11 @@ data.json
 main.js
 .vscode/
 *.code-workspace
+
+/.idea/.gitignore
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/modules.xml
+/.idea/obsidian-calendar-plugin.iml
+/.idea/codeStyles/Project.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml

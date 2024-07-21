@@ -2,9 +2,9 @@ import type { Moment } from "moment";
 import {
   getDailyNote,
   getDailyNoteSettings,
-  getDateFromFile,
+  getDateFromFile, getMonthlyNote,
   getWeeklyNote,
-  getWeeklyNoteSettings,
+  getWeeklyNoteSettings
 } from "obsidian-daily-notes-interface";
 import { FileView, TFile, ItemView, WorkspaceLeaf } from "obsidian";
 import { get } from "svelte/store";
@@ -16,13 +16,14 @@ import type { ISettings } from "src/settings";
 
 import Calendar from "./ui/Calendar.svelte";
 import { showFileMenu } from "./ui/fileMenu";
-import { activeFile, dailyNotes, weeklyNotes, settings } from "./ui/stores";
+import { activeFile, dailyNotes, weeklyNotes, settings, monthlyNotes } from "./ui/stores";
 import {
   customTagsSource,
   streakSource,
   tasksSource,
   wordCountSource,
 } from "./ui/sources";
+import { tryToCreateMonthlyNote } from "./io/monthlyNotes";
 
 export default class CalendarView extends ItemView {
   private calendar: Calendar;
@@ -254,6 +255,33 @@ export default class CalendarView extends ItemView {
       }
     }
   }
+
+  async openOrCreateMonthlyNote(
+    date: Moment,
+    inNewSplit: boolean
+  ): Promise<void> {
+    const { workspace } = this.app;
+
+    const startOfMonth = date.clone().startOf("month");
+
+    const existingFile = getMonthlyNote(date, get(monthlyNotes));
+
+    if (!existingFile) {
+      tryToCreateMonthlyNote(startOfMonth, inNewSplit, this.settings, (file) => {
+        activeFile.setFile(file);
+      });
+      return;
+    }
+
+    const leaf = inNewSplit
+      ? workspace.splitActiveLeaf()
+      : workspace.getUnpinnedLeaf();
+    await leaf.openFile(existingFile);
+
+    activeFile.setFile(existingFile);
+    workspace.setActiveLeaf(leaf, true, true)
+  }
+
 
   async openOrCreateWeeklyNote(
     date: Moment,

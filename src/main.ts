@@ -65,6 +65,17 @@ export default class CalendarPlugin extends Plugin {
     });
 
     this.addCommand({
+      id: "open-monthly-note",
+      name: "Open Monthly Note",
+      checkCallback: (checking) => {
+        if (checking) {
+          return !appHasPeriodicNotesPluginLoaded();
+        }
+        this.view.openOrCreateMonthlyNote(window.moment(), false);
+      },
+    });
+
+    this.addCommand({
       id: "reveal-active-note",
       name: "Reveal active note",
       callback: () => this.view.revealActiveNote(),
