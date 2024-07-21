@@ -42,7 +42,7 @@ export default class CalendarPlugin extends Plugin {
 
     this.addCommand({
       id: "show-calendar-view",
-      name: "Open view",
+      name: "Open vieweseseses",
       checkCallback: (checking: boolean) => {
         if (checking) {
           return (
