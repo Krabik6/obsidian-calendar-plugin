@@ -24,6 +24,8 @@
   export let onClickWeek: (date: Moment, isMetaPressed: boolean) => boolean;
   export let onContextMenuDay: (date: Moment, event: MouseEvent) => boolean;
   export let onContextMenuWeek: (date: Moment, event: MouseEvent) => boolean;
+  export let onClickMonth: (date: Moment, isMetaPressed: boolean) => boolean;
+  export let onContextMenuMonth: (date: Moment, event: MouseEvent) => boolean;
 
   export function tick() {
     today = window.moment();
@@ -62,6 +64,8 @@
   {onContextMenuWeek}
   {onClickDay}
   {onClickWeek}
+    {onClickMonth}
+    {onContextMenuMonth}
   bind:displayedMonth
   localeData={today.localeData()}
   selectedId={$activeFile}
