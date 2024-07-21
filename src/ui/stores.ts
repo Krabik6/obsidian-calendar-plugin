@@ -1,7 +1,7 @@
 import type { TFile } from "obsidian";
 import {
-  getAllDailyNotes,
-  getAllWeeklyNotes,
+  getAllDailyNotes, getAllMonthlyNotes,
+  getAllWeeklyNotes
 } from "obsidian-daily-notes-interface";
 import { writable } from "svelte/store";
 
@@ -53,9 +53,33 @@ function createWeeklyNotesStore() {
   };
 }
 
+function createMonthlyNotesStore() {
+  let hasError = false;
+  const store = writable<Record<string, TFile>>(null);
+  return {
+    reindex: () => {
+      try {
+        const monthlyNotes = getAllMonthlyNotes();
+        store.set(monthlyNotes);
+        hasError = false;
+      } catch (err) {
+        if (!hasError) {
+          console.log("[Calendar] Failed to find monthly notes folder", err);
+        }
+        store.set({});
+        hasError = true;
+      }
+    },
+    ...store,
+  };
+}
+
+
+
 export const settings = writable<ISettings>(defaultSettings);
 export const dailyNotes = createDailyNotesStore();
 export const weeklyNotes = createWeeklyNotesStore();
+export const monthlyNotes = createMonthlyNotesStore();
 
 function createSelectedFileStore() {
   const store = writable<string>(null);

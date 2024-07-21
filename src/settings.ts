@@ -17,6 +17,12 @@ export interface ISettings {
   weeklyNoteTemplate: string;
   weeklyNoteFolder: string;
 
+  // Month Note settings
+  showMonthlyNote: boolean; // Add this line
+  monthlyNoteFormat: string; // Add this line
+  monthlyNoteTemplate: string; // Add this line
+  monthlyNoteFolder: string; // Add this line
+
   localeOverride: ILocaleOverride;
 }
 
@@ -40,6 +46,11 @@ export const defaultSettings = Object.freeze({
   weeklyNoteFormat: "",
   weeklyNoteTemplate: "",
   weeklyNoteFolder: "",
+
+  showMonthlyNote: false, // Add this line
+  monthlyNoteFormat: "YYYY-MM", // Add this line
+  monthlyNoteTemplate: "", // Add this line
+  monthlyNoteFolder: "", // Add this line
 
   localeOverride: "system-default",
 });
@@ -83,6 +94,24 @@ export class CalendarSettingsTab extends PluginSettingTab {
     this.addShowWeeklyNoteSetting();
 
     if (
+      this.plugin.options.showMonthlyNote &&
+      !appHasPeriodicNotesPluginLoaded()
+    ) {
+      this.containerEl.createEl("h3", {
+        text: "Monthly Note Settings",
+      });
+      this.containerEl.createEl("p", {
+        cls: "setting-item-description",
+        text:
+          "Note: Monthly Note settings are moving. You are encouraged to install the 'Periodic Notes' plugin to keep the functionality in the future.",
+      });
+      this.addMonthlyNoteFormatSetting();
+      this.addMonthlyNoteTemplateSetting();
+      this.addMonthlyNoteFolderSetting();
+    }
+
+
+    if (
       this.plugin.options.showWeeklyNote &&
       !appHasPeriodicNotesPluginLoaded()
     ) {
@@ -104,6 +133,7 @@ export class CalendarSettingsTab extends PluginSettingTab {
     });
     this.addLocaleOverrideSetting();
   }
+
 
   addDotThresholdSetting(): void {
     new Setting(this.containerEl)
@@ -212,6 +242,59 @@ export class CalendarSettingsTab extends PluginSettingTab {
         });
       });
   }
+
+  addShowMonthlyNoteSetting(): void {
+    new Setting(this.containerEl)
+      .setName("Show month number")
+      .setDesc("Enable this to add a column with the month number")
+      .addToggle((toggle) => {
+        toggle.setValue(this.plugin.options.showMonthlyNote);
+        toggle.onChange(async (value) => {
+          this.plugin.writeOptions(() => ({ showMonthlyNote: value }));
+          this.display(); // show/hide monthly settings
+        });
+      });
+  }
+
+  addMonthlyNoteFormatSetting(): void {
+    new Setting(this.containerEl)
+      .setName("Monthly note format")
+      .setDesc("For more syntax help, refer to format reference")
+      .addText((textfield) => {
+        textfield.setValue(this.plugin.options.monthlyNoteFormat);
+        textfield.setPlaceholder("YYYY-MM");
+        textfield.onChange(async (value) => {
+          this.plugin.writeOptions(() => ({ monthlyNoteFormat: value }));
+        });
+      });
+  }
+
+  addMonthlyNoteTemplateSetting(): void {
+    new Setting(this.containerEl)
+      .setName("Monthly note template")
+      .setDesc(
+        "Choose the file you want to use as the template for your monthly notes"
+      )
+      .addText((textfield) => {
+        textfield.setValue(this.plugin.options.monthlyNoteTemplate);
+        textfield.onChange(async (value) => {
+          this.plugin.writeOptions(() => ({ monthlyNoteTemplate: value }));
+        });
+      });
+  }
+
+  addMonthlyNoteFolderSetting(): void {
+    new Setting(this.containerEl)
+      .setName("Monthly note folder")
+      .setDesc("New monthly notes will be placed here")
+      .addText((textfield) => {
+        textfield.setValue(this.plugin.options.monthlyNoteFolder);
+        textfield.onChange(async (value) => {
+          this.plugin.writeOptions(() => ({ monthlyNoteFolder: value }));
+        });
+      });
+  }
+
 
   addLocaleOverrideSetting(): void {
     const { moment } = window;
