@@ -24,6 +24,7 @@
   export let onClickWeek: (date: Moment, isMetaPressed: boolean) => boolean;
   export let onContextMenuDay: (date: Moment, event: MouseEvent) => boolean;
   export let onContextMenuWeek: (date: Moment, event: MouseEvent) => boolean;
+  export let onClickMonth: (date: Moment, isMetaPressed: boolean) => boolean;
 
   export function tick() {
     today = window.moment();
@@ -67,3 +68,8 @@
   selectedId={$activeFile}
   showWeekNums={$settings.showWeeklyNote}
 />
+
+<!-- Добавим отображение месяца как ссылку -->
+<a href="javascript:void(0)" on:click={() => onClickMonth(displayedMonth, false)}>
+  {displayedMonth.format('MMMM YYYY')}
+</a>

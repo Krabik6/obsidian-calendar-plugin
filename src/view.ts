@@ -33,6 +33,7 @@ export default class CalendarView extends ItemView {
 
     this.openOrCreateDailyNote = this.openOrCreateDailyNote.bind(this);
     this.openOrCreateWeeklyNote = this.openOrCreateWeeklyNote.bind(this);
+    this.openOrCreateMonthlyNote = this.openOrCreateMonthlyNote.bind(this); // Добавляем метод для открытия месячной заметки
 
     this.onNoteSettingsUpdate = this.onNoteSettingsUpdate.bind(this);
     this.onFileCreated = this.onFileCreated.bind(this);
@@ -105,6 +106,7 @@ export default class CalendarView extends ItemView {
       props: {
         onClickDay: this.openOrCreateDailyNote,
         onClickWeek: this.openOrCreateWeeklyNote,
+        onClickMonth: this.openOrCreateMonthlyNote, // Добавляем обработчик клика по месяцу
         onHoverDay: this.onHoverDay,
         onHoverWeek: this.onHoverWeek,
         onContextMenuDay: this.onContextMenuDay,
@@ -309,5 +311,28 @@ export default class CalendarView extends ItemView {
     await leaf.openFile(existingFile, { active : true, mode });
 
     activeFile.setFile(existingFile);
+  }
+
+  // Добавим новый метод для обработки клика по месяцу
+  async openOrCreateMonthlyNote(
+    date: Moment,
+    inNewSplit: boolean
+  ): Promise<void> {
+    const { workspace } = this.app;
+    const monthNoteTitle = date.format("MMMM YYYY");
+    let monthlyNote = this.app.vault.getAbstractFileByPath(monthNoteTitle);
+
+    if (!monthlyNote) {
+      // Если заметка не существует, создаем ее
+      monthlyNote = await this.app.vault.create(monthNoteTitle, "");
+    }
+
+    const leaf = inNewSplit
+      ? workspace.splitActiveLeaf()
+      : workspace.getUnpinnedLeaf();
+    await leaf.openFile(monthlyNote);
+
+    activeFile.setFile(monthlyNote);
+    workspace.setActiveLeaf(leaf, true, true);
   }
 }
